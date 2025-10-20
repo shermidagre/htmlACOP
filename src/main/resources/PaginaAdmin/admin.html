@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración de la API (Tabs)</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<header>
+    <h1> Panel de Microservicio Java</h1>
+    <div id="status-message"></div>
+</header>
+
+<div class="tab-nav">
+    <button class="active" onclick="openTab('compras', this)">🛒 Compras</button>
+    <button onclick="openTab('usuarios', this)">👤 Usuarios</button>
+    <button onclick="openTab('juegos', this)">🕹️ Juegos</button>
+</div>
+
+<div class="tab-content">
+
+    <div id="compras" class="tab-pane active">
+        <h2>Compras Controller (/api/compras)</h2>
+        <div class="action-group">
+            <h3>GET - Listar Todas</h3>
+            <button class="action-btn" onclick="getAllCompras()">Listar Compras</button>
+            <pre id="compras-list-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>GET - Buscar por ID</h3>
+            <input type="number" id="compras-find-id" placeholder="ID de Compra">
+            <button class="action-btn" onclick="getCompraById()">Buscar</button>
+            <pre id="compras-find-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>POST - Crear Nueva</h3>
+            <input type="number" id="compras-post-usuario-id" placeholder="Usuario ID">
+            <input type="number" id="compras-post-juego-id" placeholder="Juego ID">
+            <button class="action-btn" onclick="createCompra()">Crear Compra</button>
+            <pre id="compras-create-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>DELETE - Borrar por ID</h3>
+            <input type="number" id="compras-delete-id" placeholder="ID de Compra a Borrar">
+            <button class="action-btn" onclick="deleteCompra()">Borrar</button>
+            <pre id="compras-delete-results"></pre>
+        </div>
+    </div>
+
+    <div id="usuarios" class="tab-pane">
+        <h2>Usuario Controller (/api/usuarios)</h2>
+
+        <div class="action-group">
+            <h3>GET - Listar Todos</h3>
+            <button class="action-btn" onclick="getAllUsuarios()">Listar Usuarios</button>
+            <pre id="usuarios-list-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>GET - Buscar por ID</h3>
+            <input type="number" id="usuarios-find-id" placeholder="ID de Usuario">
+            <button class="action-btn" onclick="getUsuarioById()">Buscar</button>
+            <pre id="usuarios-find-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>POST - Crear Nuevo</h3>
+            <input type="text" id="usuarios-post-nome" placeholder="Nombre">
+            <input type="text" id="usuarios-post-email" placeholder="Email">
+            <input type="text" id="usuarios-post-senha" placeholder="Contraseña">
+            <input type="number" id="usuarios-post-idade" placeholder="Edad">
+            <button class="action-btn" onclick="createUsuario()">Crear Usuario</button>
+            <pre id="usuarios-create-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>DELETE - Borrar por ID</h3>
+            <input type="number" id="usuarios-delete-id" placeholder="ID de Usuario a Borrar">
+            <button class="action-btn" onclick="deleteUsuario()">Borrar</button>
+            <pre id="usuarios-delete-results"></pre>
+        </div>
+    </div>
+
+    <div id="juegos" class="tab-pane">
+        <h2>Juegos Controller (/api/juegos)</h2>
+
+        <div class="action-group">
+            <h3>GET - Listar Todos</h3>
+            <button class="action-btn" onclick="getAllJuegos()">Listar Juegos</button>
+            <pre id="juegos-list-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>GET - Buscar por ID</h3>
+            <input type="number" id="juegos-find-id" placeholder="ID de Juego">
+            <button class="action-btn" onclick="getJuegoById()">Buscar</button>
+            <pre id="juegos-find-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>POST - Crear Nuevo</h3>
+            <input type="text" id="juegos-post-nombre" placeholder="Nombre">
+            <input type="text" id="juegos-post-descripcion" placeholder="Descripción">
+            <input type="text" id="juegos-post-categoria" placeholder="Categoría">
+            <input type="number" id="juegos-post-precio" placeholder="Precio">
+            <input type="text" id="juegos-post-imagen" placeholder="Imagen">
+            <button class="action-btn" onclick="createJuego()">Crear Juego</button>
+            <pre id="juegos-create-results"></pre>
+        </div>
+
+        <div class="action-group">
+            <h3>DELETE - Borrar por ID</h3>
+            <input type="number" id="juegos-delete-id" placeholder="ID de Juego a Borrar">
+            <button class="action-btn" onclick="deleteJuego()">Borrar</button>
+            <pre id="juegos-delete-results"></pre>
+        </div>
+    </div>
+
+</div>
+
+<script src="admin.js"></script>
+<script>
+    // Función de JavaScript para manejar el cambio de pestañas
+    function openTab(tabName, elmnt) {
+        // Oculta todos los elementos con class="tab-pane"
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-pane");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+
+        // Elimina la clase "active" de todos los botones de navegación
+        tablinks = document.getElementsByClassName("tab-nav")[0].getElementsByTagName("button");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+
+        // Muestra la pestaña actual y añade la clase "active" al botón que la abrió
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        elmnt.classList.add("active");
+    }
+
+    // Carga la pestaña de Compras por defecto
+    document.addEventListener('DOMContentLoaded', () => {
+         // Ya está configurado en el HTML con la clase 'active',
+         // pero esta función asegura que si se recarga, mantenga la lógica de la pestaña.
+         openTab('compras', document.querySelector('.tab-nav button.active'));
+    });
+</script>
+</body>
+</html>

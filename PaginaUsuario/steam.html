@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam</title>
+    <link rel="stylesheet" href="steam.css">
+</head>
+
+<body>
+
+<header>
+    <nav>
+        <a href="#">NOVEDADES</a>
+        <a href="#">TIENDA</a>
+        <a href="#">BIBLIOTECA</a>
+    </nav>
+    <span id="user-account">Tu cuenta ▾</span>
+</header>
+
+
+<main>
+    <section>
+
+
+        <!-- Banner estilo Steam -->
+        <div class="BannerAnuncio">
+            <img src="ImagenesUsuario/steamrebajas.jpg" alt="Anuncio Steam">
+        </div>
+
+
+        <!-- Novedades Actualmente -->
+        <div class="Novedades">Novedades Actualmente</div>
+        <div class="JuegosNovedad"></div>
+
+
+        <div class="Categorias">
+            <div class="JuegosCategoriasTitulo">Explora nuevas experiencias</div>
+            <div id="JuegosCategorias" class="JuegosCategorias">
+                <button>
+                    <img src="ImagenesUsuario/pompom3.png" alt="Horror">
+                    Horror
+                </button>
+
+                <button>
+                    <img src="ImagenesUsuario/peak.png" alt="Aventura">
+                    Aventura
+                </button>
+                <button>
+                    <img src="ImagenesUsuario/phainon2.png" alt="Simulador">
+                    Simulador
+                </button>
+                <button>
+                    <img src="ImagenesUsuario/otome.jpg" alt="Otome">
+                    Otome
+                </button>
+                <button>
+                    <img src="ImagenesUsuario/shooter.jpg" alt="Shooter">
+                    Shooter
+                </button>
+                <button>
+                    <img src="ImagenesUsuario/rpg.jpg" alt="RPG">
+                    RPG
+                </button>
+        
+            </div>
+        </div>
+
+
+        <div class="Merchandising">
+            <div class="CategoriasBoxDecoracion"></div>
+            <div class="MerchandisingTitulo">NO TE PIERDAS LAS NUEVAS OFERTAS!!</div>
+            <div id="Peluches" class="Peluches">
+                <div class="peluche active">
+                    <img src="ImagenesUsuario/mydeipeluche.png" alt="Mydei">
+                </div>
+                <div class="peluche">
+                    <img src="ImagenesUsuario/bunnypeluche.png" alt="Bunny">
+                </div>
+                <div class="peluche">
+                    <img src="ImagenesUsuario/hollowpeluche.png" alt="Hollow">
+                </div>
+                <div class="peluche">
+                    <img src="ImagenesUsuario/fumopeluche.png" alt="Fumo">
+                </div>
+            </div>
+            <button id="btnPrev" class="peluche-btn">&#10094;</button>
+            <button id="btnNext" class="peluche-btn">&#10095;</button>
+        </div>
+
+
+        <div id="JuegosRecientes" class="JuegosRecientes">
+            <div class="JuegosRecientesTitulo">Jugado recientemente</div>
+            <!-- Contenedor de los juegos -->
+             <div class="JuegosFila">
+                <div id="JuegoR1" class="Juego">
+                    <img src="ImagenesUsuario/peak2.jpg" alt="Roblox">
+                </div>
+
+                <div id="JuegoR2" class="Juego">
+                    <img src="ImagenesUsuario/lethalcompany.jpg" alt="Lethal">
+                </div>
+
+                <div id="JuegoR3" class="Juego">
+                    <img src="ImagenesUsuario/phasmophobia.jpg" alt="Phasmophobia">
+                </div>
+            </div>
+        </div>
+
+
+        <div id="Creditos" class="Creditos">
+            <button>+971 55 67676</button>
+            <button>johnnyjoestar1890@gmail.com</button>
+            <button>Terminos y Ayuda</button>
+        </div>
+
+
+    </section>
+</main>
+
+<!-- Modal de Login -->
+<div id="login-modal" class="login-modal hidden">
+    <div class="login-content">
+        <span id="close-login">&times;</span>
+        <h2>Iniciar sesión</h2>
+        <input type="text" id="login-username" placeholder="Usuario o Email">
+        <input type="password" id="login-password" placeholder="Contraseña">
+        <button id="login-submit">Entrar</button>
+        <p id="login-error"></p>
+    </div>
+</div>
+
+
+<script src="steam.js"></script>
+</body>
+
+</html>
