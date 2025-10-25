@@ -267,8 +267,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // =============================================
 
 // Base URL ya definida: const API_ROOT = 'https://hibernateswagger-api-latest.onrender.com/api';
-const API_BASE_URL = 'http://localhost:8081'; // ⚠️ ASUME QUE EL BACKEND CORRE EN LOCALHOST:8081
-const API_CHAT_URL = API_BASE_URL + '/api/chat';
+const API_BASE_URL = 'https://hibernateswagger-api-latest.onrender.com/api'; // ⚠️ ASUME QUE EL BACKEND CORRE EN LOCALHOST:8081
+const API_CHAT_URL = API_BASE_URL + '/chat';
 const API_JUEGOS_URL = API_BASE_URL + '/juegos'; // Endpoint de inserción
 
 // Elementos del Chatbot (Asegúrate de que sus IDs coincidan con tu HTML/CSS)
