@@ -261,3 +261,192 @@ document.addEventListener("DOMContentLoaded", () => {
   iniciarCarruselPeluches();
   iniciarNovedades();
 });
+
+// =============================================
+// =============== CHATBOT INTELIGENTE ===============
+// =============================================
+
+// Base URL ya definida: const API_ROOT = 'https://hibernateswagger-api-latest.onrender.com/api';
+const API_BASE_URL = 'http://localhost:8081'; // ⚠️ ASUME QUE EL BACKEND CORRE EN LOCALHOST:8081
+const API_CHAT_URL = API_BASE_URL + '/api/chat';
+const API_JUEGOS_URL = API_BASE_URL + '/juegos'; // Endpoint de inserción
+
+// Elementos del Chatbot (Asegúrate de que sus IDs coincidan con tu HTML/CSS)
+const chatWindow = document.getElementById('chatbot-window');
+const toggleButton = document.getElementById('chatbot-toggle-button');
+const messagesArea = document.getElementById('chatbot-messages');
+const inputField = document.getElementById('chatbot-input');
+const sendButton = document.getElementById('chatbot-send-button');
+
+let conversationState = 'initial';
+let newGameData = {}; // Objeto para almacenar datos del juego a insertar
+
+const AUTO_ACTIVATE_DELAY = 15000; // 15 segundos
+let autoActivateTimeout;
+
+// Función auxiliar para alternar la visibilidad
+function toggleChatbot() {
+    const isHidden = chatWindow.style.display === 'none' || chatWindow.style.display === '';
+    chatWindow.style.display = isHidden ? 'flex' : 'none';
+    toggleButton.textContent = isHidden ? '✖️' : '💬';
+
+    // Si se abre, cancela la activación automática
+    clearTimeout(autoActivateTimeout);
+}
+
+// Función auxiliar para añadir mensajes al chat
+function appendMessage(text, type) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', type);
+    messageDiv.textContent = text;
+    messagesArea.appendChild(messageDiv);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+// ------------------------------------
+// LÓGICA DE COMUNICACIÓN CON EL BACKEND
+// ------------------------------------
+
+/**
+ * Llama al endpoint inteligente /api/chat
+ */
+async function getAiResponse(prompt) {
+    try {
+        const response = await fetch(API_CHAT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: El servicio experto no respondió.`);
+        }
+
+        const data = await response.json();
+        appendMessage(data.text, 'bot-message');
+    } catch (error) {
+        console.error('Error al obtener respuesta de IA:', error);
+        appendMessage("Disculpe. Hemos experimentado un fallo de conexión con la IA. Por favor, inténtelo de nuevo más tarde.", 'bot-message');
+    }
+}
+
+/**
+ * Llama al endpoint transaccional /juegos
+ */
+async function insertGameToDatabase(gameData) {
+    try {
+        const response = await fetch(API_JUEGOS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(gameData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: La inserción falló en el microservicio.`);
+        }
+        const data = await response.json();
+        appendMessage(`✅ Notificación: El juego **${data.nombre || gameData.nombre}** ha sido registrado con éxito. Gracias por su contribución.`, 'bot-message');
+    } catch (error) {
+        console.error('Error al insertar el juego:', error);
+        appendMessage(`❌ Ha ocurrido un error crítico al registrar el título. Por favor, revise el servidor.`, 'bot-message');
+    }
+}
+
+// ------------------------------------
+// LÓGICA CENTRAL DEL CHATBOT
+// ------------------------------------
+
+async function processConversation(inputLower, originalInput) {
+    let botResponse = '';
+
+    // 1. MODO TRANSACCIONAL (INSERCIÓN DE JUEGOS)
+    if (conversationState !== 'initial') {
+
+        if (conversationState === 'awaiting_name') {
+            newGameData.nombre = originalInput.toUpperCase();
+            botResponse = `Estimado usuario, el juego es: "${newGameData.nombre}". ¿Podría indicar la **plataforma** principal?`;
+            conversationState = 'awaiting_platform';
+
+        } else if (conversationState === 'awaiting_platform') {
+            newGameData.plataforma = originalInput.toUpperCase();
+            botResponse = `Agradezco la información sobre ${newGameData.plataforma}. Finalmente, requerimos una **breve descripción** o el género del título.`;
+            conversationState = 'awaiting_description';
+
+        } else if (conversationState === 'awaiting_description') {
+            newGameData.descripcion = originalInput;
+            appendMessage("Procederemos con la inserción del juego. Un momento, por favor...", 'bot-message');
+
+            await insertGameToDatabase(newGameData);
+            conversationState = 'initial'; // Reinicia el estado
+
+        }
+
+    // 2. MODO INTELIGENTE (IA) O INICIO DE TRANSACCIÓN
+    } else {
+
+        // Comprueba palabras clave para iniciar la inserción
+        if (inputLower.includes("insertar") || inputLower.includes("añadir juego") || inputLower.includes("recomendar")) {
+            botResponse = "Entendido. Si desea recomendar un título para nuestra base de datos, por favor, comience indicando el **nombre** completo del juego.";
+            conversationState = 'awaiting_name';
+
+        } else {
+            // Cualquier otra pregunta va al microservicio de IA
+            appendMessage("Consultando a nuestro sistema experto. Aguarde, por favor...", 'bot-message');
+            await getAiResponse(originalInput);
+            return;
+        }
+    }
+
+    if (botResponse) {
+        appendMessage(botResponse, 'bot-message');
+    }
+}
+
+function handleUserInput() {
+    const userText = inputField.value.trim();
+    if (userText === "") return;
+
+    appendMessage(userText, 'user-message');
+    inputField.value = '';
+
+    setTimeout(() => {
+        processConversation(userText.toLowerCase(), userText);
+    }, 500);
+}
+
+// ------------------------------------
+// INICIALIZACIÓN Y EVENTOS
+// ------------------------------------
+
+// Manejadores para enviar mensajes
+sendButton.addEventListener('click', handleUserInput);
+inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        handleUserInput();
+    }
+});
+
+// Manejador para el botón de abrir/cerrar
+toggleButton.addEventListener('click', toggleChatbot);
+
+// Configuración de Activación Automática (15s)
+document.addEventListener("DOMContentLoaded", () => {
+    // Esto se ejecutará una vez que la página esté completamente cargada
+    chatWindow.style.display = 'none'; // Asegura que esté oculto al inicio
+    toggleButton.textContent = '💬';
+
+    // Inicia el temporizador de 15 segundos
+    autoActivateTimeout = setTimeout(() => {
+        if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+            toggleChatbot();
+            appendMessage("Estimado usuario, parece que tiene alguna consulta. Estamos a su disposición.", 'bot-message');
+        }
+    }, AUTO_ACTIVATE_DELAY);
+
+    // Llamadas a tus funciones existentes de DOMContentLoaded
+    iniciarCarruselPeluches();
+    iniciarNovedades();
+});
+
+// Nota: Hemos movido las llamadas de tus funciones existentes de DOMContentLoaded
+// dentro del nuevo listener de inicialización para mantener el orden.

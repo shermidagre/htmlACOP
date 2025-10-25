@@ -20,6 +20,7 @@
     </properties>
     <build>
         <plugins>
+            <!-- Plugin de Recursos (Estaba antes, lo mantenemos) -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
@@ -32,6 +33,23 @@
                 </configuration>
             </plugin>
 
+            <!-- EL PLUGIN CRUCIAL DE SPRING BOOT -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Asegura que sepa dónde está el punto de inicio -->
+                    <mainClass>org.example.Main</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- Esta meta es la que crea el JAR ejecutable con el manifiesto correcto -->
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -41,6 +59,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -60,6 +84,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+
         <!-- Springdoc OpenAPI for Swagger documentation -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -73,5 +103,9 @@
             <artifactId>spring-restdocs-mockmvc</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+
+
     </dependencies>
 </project>

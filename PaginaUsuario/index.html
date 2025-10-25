@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Tienda de Juegos</title>
     <link rel="stylesheet" href="steam.css">
+
 </head>
 
 <body>
@@ -23,13 +24,11 @@
     <section>
 
 
-        <!-- Banner estilo Steam -->
         <div class="BannerAnuncio">
             <img src="ImagenesUsuario/steamrebajas.jpg" alt="Anuncio Steam">
         </div>
 
 
-        <!-- Novedades Actualmente -->
         <div class="Novedades">Novedades Actualmente</div>
         <div class="JuegosNovedad"></div>
 
@@ -62,7 +61,7 @@
                     <img src="ImagenesUsuario/rpg.jpg" alt="RPG">
                     RPG
                 </button>
-        
+
             </div>
         </div>
 
@@ -91,8 +90,7 @@
 
         <div id="JuegosRecientes" class="JuegosRecientes">
             <div class="JuegosRecientesTitulo">Jugado recientemente</div>
-            <!-- Contenedor de los juegos -->
-             <div class="JuegosFila">
+            <div class="JuegosFila">
                 <div id="JuegoR1" class="Juego">
                     <img src="ImagenesUsuario/peak2.jpg" alt="Roblox">
                 </div>
@@ -118,7 +116,6 @@
     </section>
 </main>
 
-<!-- Modal de Login -->
 <div id="login-modal" class="login-modal hidden">
     <div class="login-content">
         <span id="close-login">&times;</span>
@@ -128,6 +125,22 @@
         <button id="login-submit">Entrar</button>
         <p id="login-error"></p>
     </div>
+</div>
+
+<div id="chatbot-container">
+    <div id="chatbot-window" style="display:none;">
+        <div id="chatbot-header">
+            Asistente Experto 🤖
+        </div>
+        <div id="chatbot-messages">
+            <div class="message bot-message">Saludos. Soy su asistente experto. ¿En qué puedo serle de utilidad hoy?</div>
+        </div>
+        <div id="chatbot-input-area">
+            <input type="text" id="chatbot-input" placeholder="Escribe tu consulta..." autocomplete="off">
+            <button id="chatbot-send-button">Enviar</button>
+        </div>
+    </div>
+    <button id="chatbot-toggle-button">💬</button>
 </div>
 
 
