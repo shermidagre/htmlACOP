@@ -23,8 +23,6 @@ EXPOSE 8080
 # Establece el directorio de trabajo para el runtime
 WORKDIR /app
 
-# Copia el JAR generado desde la etapa de 'build'
-# ¡Importante! Asegúrate que este nombre coincida con el <artifactId>-<version>.jar
 COPY --from=build /app/target/hibernateSwagger-1.0-SNAPSHOT.jar app.jar
 
 # Comando de ejecución. Le dice a Java cómo iniciar el JAR ejecutable de Spring Boot.

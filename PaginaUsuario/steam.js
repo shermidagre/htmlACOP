@@ -266,12 +266,15 @@ document.addEventListener("DOMContentLoaded", () => {
 // =============== CHATBOT INTELIGENTE ===============
 // =============================================
 
-// Base URL ya definida: const API_ROOT = 'https://hibernateswagger-api-latest.onrender.com/api';
-const API_BASE_URL = 'https://hibernateswagger-api-latest.onrender.com/api'; // ⚠️ ASUME QUE EL BACKEND CORRE EN LOCALHOST:8081
-const API_CHAT_URL = API_BASE_URL + '/chat';
+// Base URL: ¡IMPORTANTE! Hemos cambiado la URL para que apunte a tu nueva API de Spring Boot
+// Asumimos que tu nueva API de Spring Boot está en este dominio (ajusta si es necesario)
+const API_BASE_URL = 'https://hibernateswagger-api-latest.onrender.com/api';
+
+const API_CHAT_URL = API_BASE_URL + '/chatbot/chat';
+
 const API_JUEGOS_URL = API_BASE_URL + '/juegos'; // Endpoint de inserción
 
-// Elementos del Chatbot (Asegúrate de que sus IDs coincidan con tu HTML/CSS)
+// Elementos del Chatbot (Sin cambios aquí)
 const chatWindow = document.getElementById('chatbot-window');
 const toggleButton = document.getElementById('chatbot-toggle-button');
 const messagesArea = document.getElementById('chatbot-messages');
@@ -284,7 +287,8 @@ let newGameData = {}; // Objeto para almacenar datos del juego a insertar
 const AUTO_ACTIVATE_DELAY = 15000; // 15 segundos
 let autoActivateTimeout;
 
-// Función auxiliar para alternar la visibilidad
+// ... (toggleChatbot y appendMessage - Sin cambios) ...
+
 function toggleChatbot() {
     const isHidden = chatWindow.style.display === 'none' || chatWindow.style.display === '';
     chatWindow.style.display = isHidden ? 'flex' : 'none';
@@ -294,44 +298,56 @@ function toggleChatbot() {
     clearTimeout(autoActivateTimeout);
 }
 
-// Función auxiliar para añadir mensajes al chat
 function appendMessage(text, type) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', type);
-    messageDiv.textContent = text;
+
+    // Permitir el uso de ** para negrita en la respuesta del bot (opcional)
+    if (type === 'bot-message') {
+        messageDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    } else {
+        messageDiv.textContent = text;
+    }
+
     messagesArea.appendChild(messageDiv);
     messagesArea.scrollTop = messagesArea.scrollHeight;
 }
+
 
 // ------------------------------------
 // LÓGICA DE COMUNICACIÓN CON EL BACKEND
 // ------------------------------------
 
 /**
- * Llama al endpoint inteligente /api/chat
+ * Llama al endpoint inteligente /api/chatbot/chat para obtener la respuesta de Gemini.
+ * @param {string} prompt El mensaje del usuario.
  */
 async function getAiResponse(prompt) {
     try {
+        // 🎯 CAMBIO CLAVE 1: El cuerpo espera { "mensaje": "..." }
+        const requestBody = JSON.stringify({ mensaje: prompt });
+
         const response = await fetch(API_CHAT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompt })
+            body: requestBody
         });
 
         if (!response.ok) {
-            throw new Error(`Error ${response.status}: El servicio experto no respondió.`);
+            throw new Error(`Error ${response.status}: El Profesor de Java no respondió.`);
         }
 
         const data = await response.json();
-        appendMessage(data.text, 'bot-message');
+        // 🎯 CAMBIO CLAVE 2: La respuesta espera { "respuesta": "..." }
+        appendMessage(data.respuesta, 'bot-message');
     } catch (error) {
         console.error('Error al obtener respuesta de IA:', error);
-        appendMessage("Disculpe. Hemos experimentado un fallo de conexión con la IA. Por favor, inténtelo de nuevo más tarde.", 'bot-message');
+        appendMessage("Disculpe. Hemos experimentado un fallo de conexión con la IA. Verifique que Spring Boot esté activo y la URL sea correcta.", 'bot-message');
     }
 }
 
 /**
- * Llama al endpoint transaccional /juegos
+ * Llama al endpoint transaccional /juegos (Sin cambios en esta función)
  */
 async function insertGameToDatabase(gameData) {
     try {
@@ -350,10 +366,11 @@ async function insertGameToDatabase(gameData) {
         console.error('Error al insertar el juego:', error);
         appendMessage(`❌ Ha ocurrido un error crítico al registrar el título. Por favor, revise el servidor.`, 'bot-message');
     }
+    conversationState = 'initial'; // Reinicia el estado después de intentar la inserción
 }
 
 // ------------------------------------
-// LÓGICA CENTRAL DEL CHATBOT
+// LÓGICA CENTRAL DEL CHATBOT (Ajustada para mejor limpieza)
 // ------------------------------------
 
 async function processConversation(inputLower, originalInput) {
@@ -364,12 +381,12 @@ async function processConversation(inputLower, originalInput) {
 
         if (conversationState === 'awaiting_name') {
             newGameData.nombre = originalInput.toUpperCase();
-            botResponse = `Estimado usuario, el juego es: "${newGameData.nombre}". ¿Podría indicar la **plataforma** principal?`;
+            botResponse = `Estimado usuario, el juego es: **${newGameData.nombre}**. ¿Podría indicar la **plataforma** principal?`;
             conversationState = 'awaiting_platform';
 
         } else if (conversationState === 'awaiting_platform') {
             newGameData.plataforma = originalInput.toUpperCase();
-            botResponse = `Agradezco la información sobre ${newGameData.plataforma}. Finalmente, requerimos una **breve descripción** o el género del título.`;
+            botResponse = `Agradezco la información sobre **${newGameData.plataforma}**. Finalmente, requerimos una **breve descripción** o el género del título.`;
             conversationState = 'awaiting_description';
 
         } else if (conversationState === 'awaiting_description') {
@@ -377,8 +394,8 @@ async function processConversation(inputLower, originalInput) {
             appendMessage("Procederemos con la inserción del juego. Un momento, por favor...", 'bot-message');
 
             await insertGameToDatabase(newGameData);
-            conversationState = 'initial'; // Reinicia el estado
-
+            // El estado se reinicia dentro de insertGameToDatabase al finalizar.
+            return;
         }
 
     // 2. MODO INTELIGENTE (IA) O INICIO DE TRANSACCIÓN
@@ -390,10 +407,10 @@ async function processConversation(inputLower, originalInput) {
             conversationState = 'awaiting_name';
 
         } else {
-            // Cualquier otra pregunta va al microservicio de IA
+            // Cualquier otra pregunta va al microservicio de IA (Profesor de Java)
             appendMessage("Consultando a nuestro sistema experto. Aguarde, por favor...", 'bot-message');
             await getAiResponse(originalInput);
-            return;
+            return; // Salimos, ya que getAiResponse añade el mensaje
         }
     }
 
@@ -401,6 +418,8 @@ async function processConversation(inputLower, originalInput) {
         appendMessage(botResponse, 'bot-message');
     }
 }
+
+// ... (handleUserInput y Bloque de Inicialización - Sin cambios) ...
 
 function handleUserInput() {
     const userText = inputField.value.trim();
@@ -413,10 +432,6 @@ function handleUserInput() {
         processConversation(userText.toLowerCase(), userText);
     }, 500);
 }
-
-// ------------------------------------
-// INICIALIZACIÓN Y EVENTOS
-// ------------------------------------
 
 // Manejadores para enviar mensajes
 sendButton.addEventListener('click', handleUserInput);
@@ -444,9 +459,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, AUTO_ACTIVATE_DELAY);
 
     // Llamadas a tus funciones existentes de DOMContentLoaded
-    iniciarCarruselPeluches();
-    iniciarNovedades();
+    // iniciarCarruselPeluches(); // Descomenta si aún las usas
+    // iniciarNovedades(); // Descomenta si aún las usas
 });
-
-// Nota: Hemos movido las llamadas de tus funciones existentes de DOMContentLoaded
-// dentro del nuevo listener de inicialización para mantener el orden.
