@@ -454,7 +454,6 @@ document.addEventListener("DOMContentLoaded", () => {
     autoActivateTimeout = setTimeout(() => {
         if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
             toggleChatbot();
-            appendMessage("Estimado usuario, parece que tiene alguna consulta. Estamos a su disposición.", 'bot-message');
         }
     }, AUTO_ACTIVATE_DELAY);
 

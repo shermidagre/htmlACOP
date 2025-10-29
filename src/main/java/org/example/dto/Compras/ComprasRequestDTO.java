@@ -1,5 +1,5 @@
 // ComprasRequestDTO.java - SIN anotaciones JPA
-package org.example.dto;
+package org.example.dto.Compras;
 
 /*PORQUE CREE ESTA CLASE?¿
 

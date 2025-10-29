@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.example.dto.ComprasRequestDTO;
+import org.example.dto.Compras.ComprasRequestDTO;
 import org.example.model.Compras;
 import org.example.service.ComprasService;
 import org.springframework.http.ResponseEntity;

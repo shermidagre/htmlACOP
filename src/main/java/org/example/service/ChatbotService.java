@@ -1,6 +1,9 @@
 package org.example.service;
 
-import org.example.dto.*; // Importamos los DTOs que creamos
+import org.example.dto.ChatBot.Content;
+import org.example.dto.ChatBot.GeminiRequest;
+import org.example.dto.ChatBot.GeminiResponse;
+import org.example.dto.ChatBot.Part;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,12 +28,44 @@ public class ChatbotService {
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
+    
+    //Aun no funciona , comprobar el prompt completo
+    private boolean PreguntaPaginaWeb(String mensaje) {
+        if (mensaje == null || mensaje.isBlank()) return false;
+
+        String texto = mensaje.toLowerCase();
+
+
+
+        // Frases comunes
+        List<String> frases = List.of(
+                "Teneis paginas propias de juegos?","Pagina web","Pagina web de Oliver","agina web","pagina web de oliver","pagina oliver","Pagina oliver"
+        );
+
+        boolean tieneFrase = frases.stream().anyMatch(texto::contains);
+
+        // Solo activamos si hay una intención clara (ej: "web" + verbo o pregunta)
+        return (tieneFrase) &&
+                (texto.contains("tu") || texto.contains("tú") ||
+                        texto.contains("dónde") || texto.contains("donde") ||
+                        texto.contains("me das") || texto.contains("página"));
+    }
 
     public String obtenerRespuesta(String mensajeUsuario) {
 
+        if (PreguntaPaginaWeb(mensajeUsuario)) {
+            return "Esta es la página webde Oliver: https://xogosaqui.itch.io/";
+        }
+
         // Configuración: Eres un profesor de Java útil.
-        String systemInstruction = "Tu rol es de ser un gamer friki de los juegos, el cual le gusta ayudar a los demas a elegir juegos segun sus gustos o categorias, le ayudaras a poder elegir posibles juegos que le puedan gustar, eres flexible y tambien contestas amablemente a las preguntas, si notas que la conversacion se va del tema, mandaras un mensaje diciendo : Volvamos a el tema de los videojuegos, es lo que me apasiona";
+        String systemInstruction = "Tu rol es ser un experto, apasionado y 'friki' de los videojuegos. " +
+                "Tu objetivo es ayudar al usuario a elegir juegos, categorías y resolver dudas del sector. " +
+                "**Directriz de Tono y Formato:** Responde de forma **concisa, clara y directa** como un experto, limitando la extensión de tus respuestas a **3-4 frases como máximo**." +
+                "**Regla de Desviación:** Si la conversación se desvía del tema (videojuegos, consolas, o el sector), responde inmediatamente con este mensaje único: **'Volvamos al tema de los videojuegos, ¡es lo que me apasiona!'**";
+
+
         String promptCompleto = systemInstruction + " " + mensajeUsuario;
+
 
         // 2. Crear la estructura de la solicitud JSON usando los DTOs.
         Part userPart = new Part(promptCompleto);
@@ -56,6 +91,8 @@ public class ChatbotService {
                     .map(Part::text)
                     .collect(Collectors.joining());
         }
+
+
 
         return "Lo siento, hubo un error al obtener la respuesta de la IA.";
     }

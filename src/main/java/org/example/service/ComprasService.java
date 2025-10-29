@@ -9,7 +9,7 @@ import org.example.model.Juego;
 import org.example.model.Usuario;
 import org.example.repository.JuegoRepository;
 import org.example.repository.UsuarioRepository;
-import org.example.dto.ComprasRequestDTO;
+import org.example.dto.Compras.ComprasRequestDTO;
 
 import java.util.List;
 import java.util.Optional;

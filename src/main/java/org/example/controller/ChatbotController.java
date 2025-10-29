@@ -1,7 +1,7 @@
 package org.example.controller;
 
-import org.example.dto.ChatRequest; // Importamos los DTOs para el endpoint
-import org.example.dto.ChatResponse;
+import org.example.dto.ChatBot.ChatRequest; // Importamos los DTOs para el endpoint
+import org.example.dto.ChatBot.ChatResponse;
 import org.example.service.ChatbotService; // Importamos el servicio
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
