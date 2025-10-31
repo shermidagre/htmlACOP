@@ -17,6 +17,7 @@ public class ChatbotService {
     private final WebClient webClient;
     private final String apiKey;
     private static final String MODEL = "gemini-2.5-flash";
+    private static final String URL_OLIVER = "Esta es la página web de Oliver: https://xogosaqui.itch.io/";
 
     // 1. Inyectamos la clave y configuramos el WebClient.
     public ChatbotService(@Value("${gemini.api.key}") String apiKey) {
@@ -28,36 +29,32 @@ public class ChatbotService {
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
-    
-    //Aun no funciona , comprobar el prompt completo
-    private boolean PreguntaPaginaWeb(String mensaje) {
-        if (mensaje == null || mensaje.isBlank()) return false;
 
-        String texto = mensaje.toLowerCase();
+    private String PreguntaPaginaWeb(String mensaje) {
 
+        String textoMinusculas = mensaje.toLowerCase();
 
-
-        // Frases comunes
-        List<String> frases = List.of(
-                "Teneis paginas propias de juegos?","Pagina web","Pagina web de Oliver","agina web","pagina web de oliver","pagina oliver","Pagina oliver"
+        List<String> frasesClave = List.of(
+                "pagina web de oliver", "pagina web", "pagina oliver", "paginas propias de juegos"
         );
 
-        boolean tieneFrase = frases.stream().anyMatch(texto::contains);
-
-        // Solo activamos si hay una intención clara (ej: "web" + verbo o pregunta)
-        return (tieneFrase) &&
-                (texto.contains("tu") || texto.contains("tú") ||
-                        texto.contains("dónde") || texto.contains("donde") ||
-                        texto.contains("me das") || texto.contains("página"));
+        for (String frase : frasesClave) {
+            if (textoMinusculas.contains(frase)){
+                return URL_OLIVER;
+            }
+        }
+        return mensaje;
     }
 
     public String obtenerRespuesta(String mensajeUsuario) {
 
-        if (PreguntaPaginaWeb(mensajeUsuario)) {
-            return "Esta es la página webde Oliver: https://xogosaqui.itch.io/";
+        String respuestaPredefinida = PreguntaPaginaWeb(mensajeUsuario);
+
+        if (respuestaPredefinida.equals(URL_OLIVER)) {
+            return respuestaPredefinida;
         }
 
-        // Configuración: Eres un profesor de Java útil.
+        // Configuración: Eres un experto en videojuegos.
         String systemInstruction = "Tu rol es ser un experto, apasionado y 'friki' de los videojuegos. " +
                 "Tu objetivo es ayudar al usuario a elegir juegos, categorías y resolver dudas del sector. " +
                 "**Directriz de Tono y Formato:** Responde de forma **concisa, clara y directa** como un experto, limitando la extensión de tus respuestas a **3-4 frases como máximo**." +
@@ -87,12 +84,12 @@ public class ChatbotService {
         // 4. Extraer el texto de la respuesta.
         if (response != null && !response.candidates().isEmpty()) {
             // Navegamos a través de la estructura anidada: candidates -> content -> parts -> text
-            return response.candidates().get(0).content().parts().stream()
+            String texto = response.candidates().get(0).content().parts().stream()
                     .map(Part::text)
                     .collect(Collectors.joining());
+
+            return texto;
         }
-
-
 
         return "Lo siento, hubo un error al obtener la respuesta de la IA.";
     }
